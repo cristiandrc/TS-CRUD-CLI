@@ -34,6 +34,29 @@ const promptAdd = async (): Promise<void> => {
   promptUser()
 }
 
+const promptComplete = async (): Promise<void> => {
+  console.clear()
+  const answer = await inquirer.prompt({
+    type: 'checkbox',
+    name: 'complete',
+    message: 'Mark task Complete',
+    choices: collection.getTaskItems(showComplete).map(i => ({
+      name: i.task,
+      value: i.id,
+      checked: i.complete
+    }))
+  })
+
+  console.log(answer)
+  let completeTasks: number[] = answer.complete
+
+  collection.getTaskItems(true).forEach(task => collection.markComplete(
+    task.id,
+    completeTasks.find(id => id === task.id) != undefined))
+
+  promptUser()
+}
+
 
 const promptUser = async () => {
   console.clear()
@@ -47,6 +70,9 @@ const promptUser = async () => {
   })
 
   switch (answers.command) {
+    case Commands.Complete:
+      promptComplete()
+      break
     case Commands.Toggle:
       showComplete = !showComplete
       promptUser()
